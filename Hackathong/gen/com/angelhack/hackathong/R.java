@@ -1030,10 +1030,14 @@ containing a value of this type.
         public static final int split_action_bar=0x7f05001e;
         public static final int submit_area=0x7f050039;
         public static final int tabMode=0x7f050002;
+        public static final int textView1=0x7f05003f;
         public static final int title=0x7f05002b;
         public static final int top_action_bar=0x7f050020;
+        public static final int tvFragFirst=0x7f05003c;
+        public static final int tvFragSecond=0x7f05003e;
         public static final int up=0x7f050021;
         public static final int useLogo=0x7f050003;
+        public static final int viewPager=0x7f05003d;
         public static final int withText=0x7f05000c;
     }
     public static final class integer {
@@ -1085,8 +1089,11 @@ containing a value of this type.
         public static final int abc_popup_menu_item_layout=0x7f030014;
         public static final int abc_search_dropdown_item_icons_2line=0x7f030015;
         public static final int abc_search_view=0x7f030016;
-        public static final int activity_main=0x7f030017;
-        public static final int support_simple_spinner_dropdown_item=0x7f030018;
+        public static final int first_frag=0x7f030017;
+        public static final int intialinfo_pager=0x7f030018;
+        public static final int second_frag=0x7f030019;
+        public static final int splash=0x7f03001a;
+        public static final int support_simple_spinner_dropdown_item=0x7f03001b;
     }
     public static final class string {
         /**  Content description for the action bar "home" affordance. [CHAR LIMIT=NONE] 
