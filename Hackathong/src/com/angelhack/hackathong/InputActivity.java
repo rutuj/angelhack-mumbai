@@ -127,9 +127,7 @@ public class InputActivity extends Activity{
             while( ( line = br.readLine()) != null){
                 sb.append(line);
             }
- 
             data = sb.toString();
- 
             br.close();
  
         }catch(Exception e){
@@ -138,7 +136,7 @@ public class InputActivity extends Activity{
             iStream.close();
             urlConnection.disconnect();
         }
-        System.out.println(data);
+        //System.out.println(data);
         return data;
     }
 	
@@ -211,9 +209,6 @@ public class InputActivity extends Activity{
             
             adapter = new SimpleAdapter(getBaseContext(), result, android.R.layout.simple_list_item_1, from, to);
  
-        }
-		
+        }	
 	}
-	
-
 }
