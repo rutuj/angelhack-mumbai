@@ -4,9 +4,35 @@
     android:layout_height="match_parent"
     tools:context="${packageName}.${activityClass}" >
 
-    <TextView
+    <com.angelhack.hackathong.placeAutoComplete
+        android:id="@+id/atv_destination"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/atv_origin"
+        android:ems="10"
+        android:hint="@string/destination" >
+
+        <requestFocus />
+    </com.angelhack.hackathong.placeAutoComplete>
+
+    <com.angelhack.hackathong.placeAutoComplete
+        android:id="@+id/atv_origin"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="71dp"
+        android:ems="10"
+        android:hint="@string/origin" />
+
+    <Button
+        android:id="@+id/submit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+        android:layout_below="@+id/atv_destination"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="43dp"
+        android:text="Submit" />
 
 </RelativeLayout>

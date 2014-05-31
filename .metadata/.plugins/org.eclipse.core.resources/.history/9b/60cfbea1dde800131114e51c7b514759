@@ -1,0 +1,55 @@
+package com.angelhack.hackathong;
+
+import android.app.Activity;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.AutoCompleteTextView;
+
+public class InputActivity extends Activity{
+	AutoCompleteTextView origin;
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+		origin = (AutoCompleteTextView) findViewById(R.id.atv_places);
+		origin.setThreshold(1);
+		
+		origin.addTextChangedListener(new TextWatcher() {
+			
+			@Override
+			public void onTextChanged(CharSequence place, int arg1, int arg2, int arg3) {
+				// TODO Auto-generated method stub
+				new PlaceSearch().execute(place.toString());
+			}
+			
+			@Override
+			public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
+					int arg3) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void afterTextChanged(Editable arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+		public class PlaceSearch extends AsyncTask<String,Void,Void>{
+
+			@Override
+			protected Void doInBackground(String... params) {
+				// TODO Auto-generated method stub
+				
+				return null;
+			}
+			
+		}
+	}
+	
+
+}

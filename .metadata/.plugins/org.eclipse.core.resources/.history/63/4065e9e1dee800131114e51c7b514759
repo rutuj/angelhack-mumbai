@@ -1,0 +1,91 @@
+package com.angelhack.hackathong;
+
+import android.app.Activity;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.AutoCompleteTextView;
+
+public class InputActivity extends Activity{
+	AutoCompleteTextView origin;
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+		origin = (AutoCompleteTextView) findViewById(R.id.atv_places);
+		origin.setThreshold(1);
+		
+		origin.addTextChangedListener(new TextWatcher() {
+			
+			@Override
+			public void onTextChanged(CharSequence place, int arg1, int arg2, int arg3) {
+				// TODO Auto-generated method stub
+				new PlaceSearch().execute(place.toString());
+			}
+			
+			@Override
+			public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
+					int arg3) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void afterTextChanged(Editable arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+	}
+	
+	public class PlaceSearch extends AsyncTask<String,Void,Void>{
+
+		@Override
+		protected Void doInBackground(String... params) {
+			// TODO Auto-generated method stub
+			 // For storing data from web service
+            String data = "";
+ 
+            // Obtain browser key from https://code.google.com/apis/console
+            String key = "key=YOUR_API_KEY";
+ 
+            String input="";
+ 
+            try {
+                input = "input=" + URLEncoder.encode(place[0], "utf-8");
+            } catch (UnsupportedEncodingException e1) {
+                e1.printStackTrace();
+            }
+ 
+            // place type to be searched
+            String types = "types=geocode";
+ 
+            // Sensor enabled
+            String sensor = "sensor=false";
+ 
+            // Building the parameters to the web service
+            String parameters = input+"&"+types+"&"+sensor+"&"+key;
+ 
+            // Output format
+            String output = "json";
+ 
+            // Building the url to the web service
+            String url = "https://maps.googleapis.com/maps/api/place/autocomplete/"+output+"?"+parameters;
+ 
+            try{
+                // Fetching the data from we service
+                data = downloadUrl(url);
+            }catch(Exception e){
+                Log.d("Background Task",e.toString());
+            }
+            return data;
+			return null;
+		}
+		
+	}
+	
+
+}

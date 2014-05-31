@@ -3,5 +3,7 @@
 
     <string name="app_name">Hackathong</string>
     <string name="hello_world">Hello world!</string>
-
+	<string name="str_atv_places">Enter Place Here</string>
+	<string name="origin">From</string>
+	<string name="destination">To</string>
 </resources>

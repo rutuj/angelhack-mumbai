@@ -1,0 +1,18 @@
+package com.angelhack.hackathong;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.widget.AutoCompleteTextView;
+
+public class InputActivity extends Activity{
+	AutoCompleteTextView origin;
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+		origin = (AutoCompleteTextView) findViewById(R.id.atv_places);
+	}
+	
+
+}
