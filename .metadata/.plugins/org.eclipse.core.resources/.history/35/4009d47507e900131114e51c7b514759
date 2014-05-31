@@ -41,6 +41,7 @@ public class PlaceJSONParser {
         return placesList;
     }
  
+    /** Parsing the Place JSON object */
     private HashMap<String, String> getPlace(JSONObject jPlace){
  
         HashMap<String, String> place = new HashMap<String, String>();

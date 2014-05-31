@@ -113,10 +113,13 @@ public class InputActivity extends Activity{
         try{
             URL url = new URL(outurl);
  
+            // Creating an http connection to communicate with url
             urlConnection = (HttpURLConnection) url.openConnection();
  
+            // Connecting to url
             urlConnection.connect();
  
+            // Reading data from url
             iStream = urlConnection.getInputStream();
  
             BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
@@ -147,8 +150,10 @@ public class InputActivity extends Activity{
 		@Override
 		protected String doInBackground(String... place) {
 			// TODO Auto-generated method stub
+			 // For storing data from web service
             String data = "";
  
+            // Obtain browser key from https://code.google.com/apis/console
             String key = "key=AIzaSyAFfQlDS_u_PneUcQ0ZFslD4w3VlMgwl6s";
  
             String input="";
@@ -158,13 +163,24 @@ public class InputActivity extends Activity{
             } catch (UnsupportedEncodingException e1) {
                 e1.printStackTrace();
             }
+ 
+            // place type to be searched
             String types = "types=geocode";
+ 
+            // Sensor enabled
             String sensor = "sensor=false";
+ 
+            // Building the parameters to the web service
             String parameters = input+"&"+types+"&"+sensor+"&"+key;
+ 
+            // Output format
             String output = "json";
+ 
+            // Building the url to the web service
             String url = "https://maps.googleapis.com/maps/api/place/autocomplete/"+output+"?"+parameters;
  
             try{
+                // Fetching the data from we service
                 data = downloadUrl(url);
             }catch(Exception e){
                 Log.d("Background Task",e.toString());
@@ -176,7 +192,11 @@ public class InputActivity extends Activity{
 		  @Override
 	        protected void onPostExecute(String result) {
 	            super.onPostExecute(result);
+	 
+	            // Creating ParserTask
 	            ParserTask parserTask = new ParserTask();
+	 
+	            // Starting Parsing the JSON string returned by Web Service
 	            parserTask.execute(result);
 	        }
 		

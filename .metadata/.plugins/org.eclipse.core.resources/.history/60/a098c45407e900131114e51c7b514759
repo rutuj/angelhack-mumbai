@@ -62,9 +62,8 @@ public class MainActivity extends Activity {
 		            for(Address b : addresses2){
 			            if(b.hasLatitude() && b.hasLongitude()){
 			                ll.add(new LatLng(b.getLatitude(), b.getLongitude()));
-			            	} 
-			        	}
-			        }
+			            } 
+			        }  
 			    } catch (IOException e) {
 			         // handle the exception
 			    }

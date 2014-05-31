@@ -40,8 +40,7 @@ public class MainActivity extends Activity {
 		protected void onPostExecute(Void result) {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
-			Marker origin = googleMap.addMarker(new MarkerOptions().position(ll.get(0)).title("Origin"));
-			Marker destination = googleMap.addMarker(new MarkerOptions().position(ll.get(1)).title("Destination"));
+			Marker TP = googleMap.addMarker(new MarkerOptions().position(ll.get(0)).title("Origin")); 
 		}
 
 		@Override
@@ -49,22 +48,16 @@ public class MainActivity extends Activity {
 			// TODO Auto-generated method stub
 			if(Geocoder.isPresent()){
 			    try {
-			        String location_origin = orides[0];
-			        String location_destination = orides[1];
+			        String location = orides[0];
 			        Geocoder gc = new Geocoder(getBaseContext());
-			        List<Address> addresses1= gc.getFromLocationName(location_origin, 5); 
-			        List<Address> addresses2= gc.getFromLocationName(location_destination, 5);
-			        ll = new ArrayList<LatLng>(addresses1.size()); 
-			        for(Address a : addresses1){
+			        List<Address> addresses= gc.getFromLocationName(location, 5); // get the found Address Objects
+
+			        ll = new ArrayList<LatLng>(addresses.size()); // A list to save the coordinates if they are available
+			        for(Address a : addresses){
 			            if(a.hasLatitude() && a.hasLongitude()){
 			                ll.add(new LatLng(a.getLatitude(), a.getLongitude()));
-			            } 
-		            for(Address b : addresses2){
-			            if(b.hasLatitude() && b.hasLongitude()){
-			                ll.add(new LatLng(b.getLatitude(), b.getLongitude()));
-			            	} 
-			        	}
-			        }
+			            }  
+			        }  
 			    } catch (IOException e) {
 			         // handle the exception
 			    }
