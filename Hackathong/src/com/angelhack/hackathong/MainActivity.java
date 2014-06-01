@@ -22,6 +22,10 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.SimpleAdapter;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -37,16 +41,33 @@ public class MainActivity extends Activity {
 	String[] orides=new String[2];
 	List<LatLng> ll;
     GoogleMap googleMap;
+    ArrayList<LatLng> points_on_path = new ArrayList<LatLng>();
+    Button enb_fet;
+    String radius_of_search = "5000";
+    boolean restEnabled = true;
+    boolean barEnabled = false;
+    boolean hospiEnabled = false;
+    boolean gasEnabled = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.maps);
+        enb_fet = (Button) findViewById(R.id.button1);
         Bundle extras = getIntent().getExtras();
         orides[0] = extras.getString("origin");
         orides[1] = extras.getString("destination");
         googleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         googleMap.setMyLocationEnabled(true);
         new getGeoPoints().execute(orides);
+        enb_fet.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stubl
+				enableFeatures();
+			}
+        	
+        });
     }
     public class getGeoPoints extends AsyncTask<String[],String[],Void> {
 
@@ -183,20 +204,17 @@ public class MainActivity extends Activity {
             for(int i=0;i<result.size();i++){
                 points = new ArrayList<LatLng>();
                 lineOptions = new PolylineOptions();
-
+                
                 List<HashMap<String, String>> path = result.get(i);
-
+                
                 for(int j=0;j<path.size();j++){
                     HashMap<String,String> point = path.get(j);
- 
                     double lat = Double.parseDouble(point.get("lat"));
                     double lng = Double.parseDouble(point.get("lng"));
                     LatLng position = new LatLng(lat, lng);
- 
+                    points_on_path.add(position);
                     points.add(position);
                 }
- 
-                // Adding all the points in the route to LineOptions
                 lineOptions.addAll(points);
                 lineOptions.width(2);
                 lineOptions.color(Color.RED);
@@ -222,5 +240,90 @@ public class MainActivity extends Activity {
 		}
     	
     }
+    
+    private void enableFeatures() {
+    	int size = points_on_path.size();
+System.out.println("size " + size);
+    	for(int i=0;i<size;i++){
+    		LatLng point = points_on_path.get(i);
+    		String types = "restaurants";
+    		if(barEnabled=true) types = types+"|bar";
+    		if(gasEnabled=true) types = types+"|gas_station";
+    		if(hospiEnabled=true) types = types+"|hospital";
+    		String url = "https://maps.googleapis.com/maps/api/place/radarsearch/json?location="+point.latitude+","+point.longitude+"&radius="+radius_of_search+"&types="+types+"&sensor=false&key=AIzaSyAFfQlDS_u_PneUcQ0ZFslD4w3VlMgwl6s";
+    		new DownloadFeatures().execute(url);
+    	}
+    }
+    
+    private class DownloadFeatures extends AsyncTask<String,Integer,String>{
+
+		@Override
+		protected void onPostExecute(String result) {
+			// TODO Auto-generated method stub
+			super.onPostExecute(result);
+			FeaturesParserTask parser = new FeaturesParserTask();
+			parser.execute(result);
+		}
+
+		@Override
+		protected String doInBackground(
+				String... arg0) {
+			// TODO Auto-generated method stub
+			String data ="";
+			
+				try {
+					data = downloadUrl(arg0[0]);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				System.out.println(data + "from DownloadFeatures");
+			return data;
+		}
+    	
+    }
+    
+    private class FeaturesParserTask extends AsyncTask<String,Integer,List<HashMap<String,String>>>{
+
+		@Override
+		protected List<HashMap<String, String>> doInBackground(String... params) {
+			// TODO Auto-generated method stub
+			List<HashMap<String, String>> features = null;
+			JSONObject jObject = new JSONObject(); 
+			FeaturesJSONParser placeJsonParser = new FeaturesJSONParser();
+			 
+            try{
+                jObject = new JSONObject(params[0]);
+
+                features = placeJsonParser.parse(jObject);
+ 
+            }catch(Exception e){
+                Log.d("Exception",e.toString());
+            }
+            return features;
+		}
+		
+        @Override
+        protected void onPostExecute(List<HashMap<String, String>> list) {
+ 
+        	for(int i=0;i<list.size();i++){
+        		 
+                MarkerOptions markerOptions = new MarkerOptions();
+ 
+                HashMap<String, String> hmPlace = list.get(i);
+ 
+                double lat = Double.parseDouble(hmPlace.get("lat"));
+                double lng = Double.parseDouble(hmPlace.get("lng"));
+                String name = hmPlace.get("name");
+                String vicinity = hmPlace.get("vicinity");
+                LatLng latLng = new LatLng(lat, lng);
+                markerOptions.position(latLng);
+                markerOptions.title(name + " : " + vicinity);
+                googleMap.addMarker(markerOptions);
+            }
+        }
+    	
+    }
+    
 }
 

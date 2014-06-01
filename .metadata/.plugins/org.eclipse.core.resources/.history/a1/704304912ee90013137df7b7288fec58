@@ -1,0 +1,322 @@
+package com.angelhack.hackathong;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.SimpleAdapter;
+
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
+
+@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+public class MainActivity extends Activity {
+	String[] orides=new String[2];
+	List<LatLng> ll;
+    GoogleMap googleMap;
+    List<LatLng> points_on_path;
+    Button enb_fet;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.maps);
+        enb_fet = (Button) findViewById(R.id.button1);
+        Bundle extras = getIntent().getExtras();
+        orides[0] = extras.getString("origin");
+        orides[1] = extras.getString("destination");
+        googleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+        googleMap.setMyLocationEnabled(true);
+        new getGeoPoints().execute(orides);
+        enb_fet.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stubl
+				enableFeatures();
+				
+			}
+        	
+        });
+    }
+    public class getGeoPoints extends AsyncTask<String[],String[],Void> {
+
+		@Override
+		protected void onPostExecute(Void result) {
+			// TODO Auto-generated method stub
+			super.onPostExecute(result);
+			Marker origin = googleMap.addMarker(new MarkerOptions().position(ll.get(0)).title("Origin"));
+			Marker destination = googleMap.addMarker(new MarkerOptions().position(ll.get(1)).title("Destination"));
+			CameraUpdate center=
+			        CameraUpdateFactory.newLatLng(ll.get(0));
+		    CameraUpdate zoom=CameraUpdateFactory.zoomTo(15);
+
+		    googleMap.moveCamera(center);
+		    googleMap.animateCamera(zoom);
+		    String url = getDirectionsUrl(ll.get(0), ll.get(1));
+		    System.out.println(url);
+		    DownloadTask downloadTask = new DownloadTask();
+            downloadTask.execute(url);
+		}
+
+
+		@Override
+		protected Void doInBackground(String[]... arg0) {
+			// TODO Auto-generated method stub
+			if(Geocoder.isPresent()){
+			    try {
+			        String location_origin = orides[0];
+			        String location_destination = orides[1];
+			        Geocoder gc = new Geocoder(getBaseContext());
+			        List<Address> addresses1= gc.getFromLocationName(location_origin, 5); 
+			        List<Address> addresses2= gc.getFromLocationName(location_destination, 5);
+			        ll = new ArrayList<LatLng>(addresses1.size()); 
+			        for(Address a : addresses1){
+			            if(a.hasLatitude() && a.hasLongitude()){
+			                ll.add(new LatLng(a.getLatitude(), a.getLongitude()));
+			            } 
+		            for(Address b : addresses2){
+			            if(b.hasLatitude() && b.hasLongitude()){
+			                ll.add(new LatLng(b.getLatitude(), b.getLongitude()));
+			            	} 
+			        	}
+			        }
+			    } catch (IOException e) {
+			         // handle the exception
+			    }
+			}
+			
+			return null;
+		}	
+    }
+  
+    private String getDirectionsUrl(LatLng origin,LatLng dest){
+        String str_origin = "origin="+origin.latitude+","+origin.longitude;
+        String str_dest = "destination="+dest.latitude+","+dest.longitude;
+        String sensor = "sensor=false";
+        String parameters = str_origin+"&"+str_dest+"&"+sensor;
+        String output = "json";
+        String url = "https://maps.googleapis.com/maps/api/directions/"+output+"?"+parameters;
+        return url;
+    }
+    
+    private String downloadUrl(String outurl) throws IOException{
+        String data = "";
+        InputStream iStream = null;
+        HttpURLConnection urlConnection = null;
+        try{
+            URL url = new URL(outurl);
+ 
+            urlConnection = (HttpURLConnection) url.openConnection();
+ 
+            urlConnection.connect();
+ 
+            iStream = urlConnection.getInputStream();
+ 
+            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
+ 
+            StringBuffer sb = new StringBuffer();
+ 
+            String line = "";
+            while( ( line = br.readLine()) != null){
+                sb.append(line);
+            }
+            data = sb.toString();
+            br.close();
+ 
+        }catch(Exception e){
+            Log.d("Exception while downloading url", e.toString());
+        }finally{
+            iStream.close();
+            urlConnection.disconnect();
+        }
+        //System.out.println(data);
+        return data;
+    }
+    
+    private class DownloadTask extends AsyncTask<String,Integer,String>{
+
+		@Override
+		protected void onPostExecute(String result) {
+			// TODO Auto-generated method stub
+			super.onPostExecute(result);
+			ParserTask parser = new ParserTask();
+			parser.execute(result);
+		}
+
+		@Override
+		protected String doInBackground(
+				String... arg0) {
+			// TODO Auto-generated method stub
+			String data ="";
+			
+				try {
+					data = downloadUrl(arg0[0]);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				//System.out.println(data + "from DownloadTask");
+			return data;
+		}
+    	
+    }
+    private class ParserTask extends AsyncTask<String,Integer,List<List<HashMap<String, String>>>>{
+
+		@Override
+		protected void onPostExecute(List<List<HashMap<String, String>>> result) {
+			// TODO Auto-generated method stub
+			super.onPostExecute(result);
+			ArrayList<LatLng> points = null;
+            PolylineOptions lineOptions = null;
+            MarkerOptions markerOptions = new MarkerOptions();
+ 
+            for(int i=0;i<result.size();i++){
+                points = new ArrayList<LatLng>();
+                lineOptions = new PolylineOptions();
+                
+                List<HashMap<String, String>> path = result.get(i);
+                
+                for(int j=0;j<path.size();j++){
+                    HashMap<String,String> point = path.get(j);
+                    System.out.println("path.size() " + path.size());
+                    double lat = Double.parseDouble(point.get("lat"));
+                    double lng = Double.parseDouble(point.get("lng"));
+                    LatLng position = new LatLng(lat, lng);
+                    points_on_path.add(position);
+                    points.add(position);
+                }
+                lineOptions.addAll(points);
+                lineOptions.width(2);
+                lineOptions.color(Color.RED);
+            }
+            googleMap.addPolyline(lineOptions);
+		}
+
+		@Override
+		protected List<List<HashMap<String, String>>> doInBackground(
+				String... params) {
+			// TODO Auto-generated method stub
+			List<List<HashMap<String, String>>> result = null;
+			JSONObject jObject = null;
+			try {
+				jObject = new JSONObject(params[0]);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			DirectionsJSONParser parser = new DirectionsJSONParser();
+			result = parser.parse(jObject);
+			return result;
+		}
+    	
+    }
+    
+    private void enableFeatures() {
+    	int size = points_on_path.size();
+    	for(int i=0;i<size;i++){
+    		LatLng point = points_on_path.get(i);
+    		String url = "https://maps.googleapis.com/maps/api/place/radarsearch/json?location="+point.latitude+","+point.longitude+"&radius=5000&types=restaurants&sensor=false&key=AIzaSyAFfQlDS_u_PneUcQ0ZFslD4w3VlMgwl6s";
+    		new DownloadFeatures().execute(url);
+    	}
+    }
+    
+    private class DownloadFeatures extends AsyncTask<String,Integer,String>{
+
+		@Override
+		protected void onPostExecute(String result) {
+			// TODO Auto-generated method stub
+			super.onPostExecute(result);
+			FeaturesParserTask parser = new FeaturesParserTask();
+			parser.execute(result);
+		}
+
+		@Override
+		protected String doInBackground(
+				String... arg0) {
+			// TODO Auto-generated method stub
+			String data ="";
+			
+				try {
+					data = downloadUrl(arg0[0]);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				//System.out.println(data + "from DownloadTask");
+			return data;
+		}
+    	
+    }
+    
+    private class FeaturesParserTask extends AsyncTask<String,Integer,List<HashMap<String,String>>>{
+
+		@Override
+		protected List<HashMap<String, String>> doInBackground(String... params) {
+			// TODO Auto-generated method stub
+			List<HashMap<String, String>> features = null;
+			JSONObject jObject = new JSONObject(); 
+			FeaturesJSONParser placeJsonParser = new FeaturesJSONParser();
+			 
+            try{
+                jObject = new JSONObject(params[0]);
+
+                features = placeJsonParser.parse(jObject);
+ 
+            }catch(Exception e){
+                Log.d("Exception",e.toString());
+            }
+            return features;
+		}
+		
+        @Override
+        protected void onPostExecute(List<HashMap<String, String>> list) {
+ 
+        	for(int i=0;i<list.size();i++){
+        		 
+                MarkerOptions markerOptions = new MarkerOptions();
+ 
+                HashMap<String, String> hmPlace = list.get(i);
+ 
+                double lat = Double.parseDouble(hmPlace.get("lat"));
+                double lng = Double.parseDouble(hmPlace.get("lng"));
+                String name = hmPlace.get("name");
+                String vicinity = hmPlace.get("vicinity");
+ 
+                LatLng latLng = new LatLng(lat, lng);
+                markerOptions.position(latLng);
+                markerOptions.title(name + " : " + vicinity);
+                googleMap.addMarker(markerOptions);
+            }
+        }
+    	
+    }
+    
+}
+

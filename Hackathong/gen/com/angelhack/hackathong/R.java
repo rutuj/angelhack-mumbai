@@ -1351,8 +1351,9 @@ containing a value of this type.
         public static final int ic_plusone_small_off_client=0x7f020071;
         public static final int ic_plusone_standard_off_client=0x7f020072;
         public static final int ic_plusone_tall_off_client=0x7f020073;
-        public static final int powered_by_google_dark=0x7f020074;
-        public static final int powered_by_google_light=0x7f020075;
+        public static final int logo=0x7f020074;
+        public static final int powered_by_google_dark=0x7f020075;
+        public static final int powered_by_google_light=0x7f020076;
     }
     public static final class id {
         public static final int action_bar=0x7f07002e;
@@ -1373,6 +1374,7 @@ containing a value of this type.
         public static final int atv_places=0x7f070052;
         public static final int beginning=0x7f070023;
         public static final int book_now=0x7f070010;
+        public static final int button1=0x7f070053;
         public static final int buyButton=0x7f07000a;
         public static final int buy_now=0x7f07000f;
         public static final int buy_with_google=0x7f07000e;

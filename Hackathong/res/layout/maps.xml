@@ -11,6 +11,12 @@
           android:layout_below="@+id/atv_places"
           android:name="com.google.android.gms.maps.MapFragment"/>
 
-          
+	<Button
+	    android:id="@+id/button1"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentBottom="true"
+	    android:layout_centerHorizontal="true"
+	    android:text="Enable Features" />
 
 </RelativeLayout>

@@ -11,10 +11,10 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/atv_origin"
         android:ems="10"
-        android:hint="@string/destination" >
+        android:hint="@string/destination" />
 
-        <requestFocus />
-    </com.angelhack.hackathong.placeAutoComplete>
+
+
 
     <com.angelhack.hackathong.placeAutoComplete
         android:id="@+id/atv_origin"
@@ -24,7 +24,9 @@
         android:layout_alignParentTop="true"
         android:layout_marginTop="71dp"
         android:ems="10"
-        android:hint="@string/origin" />
+        android:hint="@string/origin" >
+        <requestFocus />
+    </com.angelhack.hackathong.placeAutoComplete>
 
     <Button
         android:id="@+id/submit"

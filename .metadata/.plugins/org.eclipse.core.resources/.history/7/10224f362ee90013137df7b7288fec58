@@ -1,0 +1,64 @@
+package com.angelhack.hackathong;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public class FeaturesJSONParser {
+
+	public List<HashMap<String,String>> parse(JSONObject jObject){
+		 
+        JSONArray jFeatures = null;
+        try {
+            jFeatures = jObject.getJSONArray("results");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return getFeatures(jFeatures);
+    }
+ 
+    private List<HashMap<String, String>> getFeatures(JSONArray jFeatures){
+        int featuresCount = jFeatures.length();
+        List<HashMap<String, String>> featuresList = new ArrayList<HashMap<String,String>>();
+        HashMap<String, String> feature = null;
+        for(int i=0; i<featuresCount;i++){
+            try {
+                feature = getfeature((JSONObject)jFeatures.get(i));
+                featuresList.add(feature);
+ 
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+ 
+        return featuresList;
+    }
+ 
+    private HashMap<String, String> getfeature(JSONObject jfeature){
+ 
+        HashMap<String, String> feature = new HashMap<String, String>();
+ 
+        String lgn="";
+        String lat="";
+        String name="";
+ 
+        try {
+ 
+            name = jfeature.getString("formatted_address");
+            lat = jfeature.getJSONObject("geometry").getJSONObject("location").getString("latitude");
+            lat = jfeature.getJSONObject("geometry").getJSONObject("location").getString("longitude");
+ 
+            feature.put("formatted_address", name);
+            feature.put("lat",lat);
+            feature.put("lgn",lgn);
+ 
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return feature;
+    }
+}

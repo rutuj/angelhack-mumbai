@@ -34,7 +34,6 @@ public class DirectionsJSONParser {
                     for(int k=0;k<jSteps.length();k++){
                         
                         polyline = (String)((JSONObject)((JSONObject)jSteps.get(k)).get("polyline")).get("points");
-                        System.out.println(polyline);
                         List<LatLng> list = decodePoly(polyline);
  
                         for(int l=0;l<list.size();l++){
